@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: 3
+
+tasks:
+  build:
+    desc: Build a Container
+    vars:
+      ARGS: '{{.ARGS | default ""}}'
+      TAGS: '{{ range (splitList "," (.TAGS | default "latest")) }} -t {{$.NAME}}:{{.}} {{end}}'
+    cmd: docker build --output type=image,compression=zstd {{.TAGS}} {{.ARGS}} {{.DIR}}
+
+  push:
+    desc: Push to a registry
+    vars:
+      REGISTRY: '{{ default .REGISTRY "ghcr.io/evilhamsterman"}}'
+      NAME: "{{.REGISTRY}}/{{.NAME}}"
+    cmd:
+      task: build
+      vars:
+        ARGS: --push
+        NAME: "{{.NAME}}"

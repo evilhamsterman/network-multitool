@@ -1,0 +1,28 @@
+# https://taskfile.dev
+
+version: "3"
+
+includes:
+  utils:
+    taskfile: ./taskfile/utils.yaml
+    internal: true
+    vars:
+      NAME: network-multitool
+      TAGS: 'latest,{{now | date "2006-01-02.1504"}}'
+      DIR: "{{.TASK_DIR}}"
+
+tasks:
+  build:
+    desc: Build the network-multitool container
+    cmd:
+      task: utils:build
+
+  push:
+    cmd:
+      task: utils:push
+
+  run:
+    desc: Open a shell in the container
+    deps:
+      - build
+    cmd: docker run --rm -it network-multitool sh -c "cd /home/dan && /usr/bin/fish"
